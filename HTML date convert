@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Date Conversion</title>
+</head>
+<body>
+    <h1>Date Conversion</h1>
+
+    <p>Gregorian Date: <input type="date" id="gregorianDate"></p>
+    <button onclick="convertDate()">Convert</button>
+    
+    <p>Persian Date: <span id="persianDate"></span></p>
+
+    <script>
+        function convertDate() {
+            var gregorianDate = document.getElementById("gregorianDate").value;
+            var convertedDate = gregorianToPersian(gregorianDate);
+            document.getElementById("persianDate").innerText = convertedDate;
+        }
+
+        function gregorianToPersian(gregorianDate) {
+            var gregorianParts = gregorianDate.split('-');
+            var year = parseInt(gregorianParts[0]);
+            var month = parseInt(gregorianParts[1]);
+            var day = parseInt(gregorianParts[2]);
+
+            var persianDate = toPersian(year, month, day);
+            return persianDate.join('/');
+        }
+
+        function toPersian(gy, gm, gd) {
+            var jy = gy - 621;
+            var g_days_in_month = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+            var j_days_in_month = [31, 31, 31, 31, 31, 31, 30, 30, 30, 30, 30, 29];
+            var gy_end_month = (gm > 6) ? 31 : 30;
+            var gy_isleap = (((gy % 4) == 0) && (((gy % 100) != 0) || ((gy % 400) == 0))) ? 1 : 0;
+            var jy_end_month = (gm > 6) ? 30 : 29;
+            var day_in_year = 0;
+            var day_in_month = 0;
+
+            var j_day = 0, j_month = 0, j_year = 0;
+            var i = 0;
+            if (gy > 1600) {
+                jy = 979;
+                gy -= 1600;
+            }
+            j_day = 365 * gy + parseInt((gy + 3) / 4) - parseInt((gy + 99) / 100) + parseInt((gy + 399) / 400);
+            for (i = 0; i < gm - 1; i++)
+                j_day += g_days_in_month[i];
+            if (gm > 2 && ((gy % 4) == 0) && (((gy % 100) != 0) || ((gy % 400) == 0)))
+                j_day++;
+            j_day += gd;
+            j_day -= 79;
+            jy += 33 * (parseInt(j_day / 12053));
+            j_day %= 12053;
+            jy += 4 * (parseInt(j_day / 1461));
+            j_day %= 1461;
+            if (j_day > 365) {
+                jy += parseInt((j_day - 1) / 365);
+                j_day = (j_day - 1) % 365;
+            }
+            for (i = 0; i < 11 && j_day >= j_days_in_month[i]; i++)
+                j_day -= j_days_in_month[i];
+            j_month = i + 1;
+            j_day += 1;
+            return [jy, j_month, j_day];
+        }
+    </script>
+</body>
+</html>
